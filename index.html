@@ -1,0 +1,400 @@
+<!-- StAuth10244: I Mahesh Regmi, 000905377 certify that this material is my original work. No other person's work has been used without due acknowledgement. 
+ I have not made my work available to anyone else.-->
+
+ <!DOCTYPE html>
+ <html lang="en">
+ 
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Roll the Cubes</title>
+     <!-- It includes Google Fonts for Poppins font family -->
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+     <!-- It includes React Library -->
+     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+     <!-- It includes ReactDOM Library -->
+     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+     <!-- It includes Babel for JSX transformation -->
+     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+ </head>
+ 
+ <body>
+    <!-- It is a root element for React to render into -->
+     <div id="root"></div>
+ 
+     <script type="text/babel">
+        // It is a CubeRoller componenet which represents a single cube.
+         function CubeRoller({ faceCount, onRoll, isSpinning }) {
+             return (
+                 <div
+                     className={`cube ${isSpinning ? 'spinning' : ''}`}
+                     onClick={onRoll}
+                 >
+                     {faceCount}
+                 </div>
+             );
+         }
+ 
+         // It is a Main CubeGame Component
+         function CubeGame() {
+            // State Variables
+             const [cubeCount, setCubeCount] = React.useState(1);
+             const [facesPerCube, setFacesPerCube] = React.useState(6);
+             const [cubeResults, setCubeResults] = React.useState([1]);
+             const [spinningCubes, setSpinningCubes] = React.useState([]);
+ 
+             // This functions adds a new cube
+             const addCube = () => {
+                 setCubeCount(cubeCount + 1);
+                 setCubeResults([...cubeResults, 1]);
+             };
+ 
+             // This function resets the code
+             const resetGame = () => {
+                 setCubeCount(1);
+                 setFacesPerCube(6);
+                 setCubeResults([1]);
+             };
+ 
+             // This function rolls the cubes
+             const rollCubes = (index = null) => {
+                 const newSpinningCubes = index !== null ? [index] : [...Array(cubeCount).keys()];
+                 setSpinningCubes(newSpinningCubes);
+ 
+                 // It stimulates the rolling animation
+                 setTimeout(() => {
+                     setCubeResults(prevResults =>
+                         prevResults.map((result, idx) =>
+                         // If the cube is spinning, generate a new random values if it is not spinnig keep the existing value
+                             newSpinningCubes.includes(idx) ? Math.floor(Math.random() * facesPerCube) + 1 : result
+                         )
+                     );
+                     setSpinningCubes([]);
+                 }, 1000);
+             };
+ 
+             // It renders the game interface
+             return (
+                 <div className="game-container">
+                     <h1>🎲 Roll the Cubes</h1>
+ 
+                     {/* It is the control section fot the game settings */}
+                     <div className="control-section">
+                        {/* It is the contol for the cube count */}
+                         <div className="setting-group">
+                             <label>
+                                 Number of cubes:
+                                 <span className="setting-value" onClick={addCube}>{cubeCount}</span>
+                             </label>
+                             <div className="button-set">
+                                 <button onClick={resetGame} className="reset-button">Reset</button>
+                             </div>
+                         </div>
+ 
+                         {/* It is the contol for the cube faces*/}
+                         <div className="setting-group">
+                             <label>
+                                 Number of faces:
+                                 <span className="setting-value">{facesPerCube}</span>
+                             </label>
+                             <div className="button-set">
+                                    {/* It is a button to decrease the number of faces on each cube */}
+                                 <button onClick={() => setFacesPerCube(Math.max(facesPerCube - 1, 1))} className="adjust-button">-</button>
+                                     {/* It is a button to increase the number of faces on each cube */}
+                                 <button onClick={() => setFacesPerCube(Math.min(facesPerCube + 1, 10))} className="adjust-button">+</button>
+                             </div>
+                         </div>
+                     </div>
+ 
+                     {/* It rolls all the cubes button */}
+                     <button onClick={() => rollCubes()} className="roll-button">Roll All Cubes</button>
+ 
+                     {/* This defines the display area for the cubes*/}
+                     <div className="cube-display">
+                         {cubeResults.map((result, index) => (
+                             <CubeRoller
+                                 key={index}
+                                 faceCount={result}
+                                 onRoll={() => rollCubes(index)}
+                                 isSpinning={spinningCubes.includes(index)}
+                             />
+                         ))}
+                     </div>
+                 </div>
+             );
+         }
+ 
+         // It renders the CubeGame component to the root element
+         ReactDOM.render(<CubeGame />, document.getElementById('root'));
+     </script>
+ 
+     <style>
+        /* It imports the google font. */
+         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+ 
+         /* It is the css variables for color scheme.*/
+         :root {
+             --primary-color: #667eea;
+             --secondary-color: #764ba2;
+             --accent-color: #4cd964;
+             --text-color: #333;
+             --bg-color: #f0f4f8;
+         }
+ 
+         /* Global styles */
+         body {
+             font-family: 'Poppins', sans-serif;
+             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+             margin: 0;
+             padding: 0;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             min-height: 100vh;
+             color: var(--text-color);
+         }
+ 
+         /* It is the css for the main container */
+         .game-container {
+             max-width: 500px;
+             width: 90%;
+             padding: 40px;
+             background-color: rgba(255, 255, 255, 0.9);
+             border-radius: 20px;
+             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+             backdrop-filter: blur(10px);
+             transition: all 0.3s ease;
+         }
+ 
+         .game-container:hover {
+             transform: translateY(-5px);
+             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+         }
+ 
+         /* It is the style for the header */
+         h1 {
+             color: var(--primary-color);
+             font-size: 2.5rem;
+             margin-bottom: 30px;
+             text-align: center;
+             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+             position: relative;
+             overflow: hidden;
+         }
+ 
+         h1::after {
+             content: '';
+             position: absolute;
+             bottom: 0;
+             left: 50%;
+             width: 0;
+             height: 3px;
+             background: var(--accent-color);
+             transition: all 0.3s ease;
+         }
+ 
+         .game-container:hover h1::after {
+             width: 100%;
+             left: 0;
+         }
+ 
+         /* It is the style for the contorl section*/
+         .control-section {
+             display: flex;
+             flex-direction: column;
+             gap: 20px;
+             margin-bottom: 30px;
+         }
+ 
+         /* It is the style for the setting group*/
+         .setting-group {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             background-color: var(--bg-color);
+             padding: 15px;
+             border-radius: 10px;
+             transition: all 0.3s ease;
+         }
+ 
+         .setting-group:hover {
+             background-color: #fff;
+             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+         }
+ 
+         label {
+             font-size: 1.1rem;
+             color: var(--text-color);
+         }
+ 
+         .setting-value {
+             font-weight: 600;
+             color: var(--primary-color);
+             cursor: pointer;
+             transition: all 0.3s ease;
+         }
+ 
+         .setting-value:hover {
+             transform: scale(1.1);
+             color: var(--secondary-color);
+         }
+ 
+         .button-set {
+             display: flex;
+             gap: 10px;
+         }
+ 
+         /* It is the style for the button */
+         button {
+             cursor: pointer;
+             border: none;
+             padding: 10px 20px;
+             font-size: 1rem;
+             border-radius: 50px;
+             transition: all 0.3s ease;
+             font-weight: 600;
+             text-transform: uppercase;
+             position: relative;
+             overflow: hidden;
+         }
+ 
+         button::before {
+             content: '';
+             position: absolute;
+             top: 0;
+             left: -100%;
+             width: 100%;
+             height: 100%;
+             background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+             transition: all 0.5s;
+         }
+ 
+         button:hover::before {
+             left: 100%;
+         }
+ 
+         .adjust-button {
+             background-color: var(--primary-color);
+             color: white;
+         }
+ 
+         .adjust-button:hover {
+             background-color: var(--secondary-color);
+             transform: translateY(-2px);
+         }
+ 
+         .reset-button {
+             background-color: #ff6b6b;
+             color: white;
+         }
+ 
+         .reset-button:hover {
+             background-color: #ff5252;
+             transform: translateY(-2px);
+         }
+ 
+         .roll-button {
+             background-color: var(--accent-color);
+             color: white;
+             font-size: 1.2rem;
+             padding: 15px 40px;
+             margin: 20px 0;
+             width: 100%;
+             transition: all 0.3s ease;
+         }
+ 
+         .roll-button:hover {
+             background-color: #41c057;
+             transform: translateY(-2px);
+             box-shadow: 0 5px 15px rgba(76, 217, 100, 0.4);
+         }
+ 
+         /* It is the style for the cube display */
+         .cube-display {
+             display: flex;
+             justify-content: center;
+             flex-wrap: wrap;
+             gap: 20px;
+             margin-top: 30px;
+         }
+ 
+         .cube {
+             width: 60px;
+             height: 60px;
+             background-color: var(--accent-color);
+             color: white;
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             border-radius: 10px;
+             font-size: 2rem;
+             font-weight: bold;
+             cursor: pointer;
+             transition: all 0.3s ease;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+         }
+ 
+         .cube:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+         }
+ 
+         .spinning {
+             animation: spin 1s forwards;
+         }
+ 
+         /* It is the animation for the spinning cubes */
+         @keyframes spin {
+             0% {
+                 transform: scale(1) rotate(0deg);
+             }
+ 
+             50% {
+                 transform: scale(1.2) rotate(180deg);
+             }
+ 
+             100% {
+                 transform: scale(1) rotate(360deg);
+             }
+         }
+ 
+         /* It is the responsive design for the mobile devices */
+         @media (max-width: 480px) {
+             .game-container {
+                 padding: 20px;
+             }
+ 
+             h1 {
+                 font-size: 2rem;
+             }
+ 
+             .setting-group {
+                 flex-direction: column;
+                 align-items: flex-start;
+             }
+ 
+             .setting-group label {
+                 margin-bottom: 10px;
+             }
+ 
+             .button-set {
+                 width: 100%;
+                 justify-content: space-between;
+             }
+ 
+             button {
+                 width: 100%;
+                 padding: 10px;
+                 font-size: 0.9rem;
+             }
+ 
+             .cube {
+                 width: 50px;
+                 height: 50px;
+                 font-size: 1.5rem;
+             }
+         }
+     </style>
+ </body>
+ 
+ </html>
